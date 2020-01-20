@@ -3,13 +3,15 @@
 import platform
 import tkinter as tk
 from tkinter import ttk
+
 import cv2
-import lib.Functions as Func
-import lib.LogFile as Log
+
 import lib.Arduino as Ard
 import lib.Config as Conf
-import lib.Process as Proc
 import lib.Dialog as Dlg
+import lib.Functions as Func
+import lib.LogFile as Log
+import lib.Process as Proc
 
 makeLogFile = False  # bool to turn logfiles on or off
 
@@ -112,7 +114,7 @@ class frameLeft:  # frame for process control, massage box and control tree
     def __init__(self, gui):  # initialises frame
         self.gui = gui
         self.frame = tk.Frame(self.gui.window)
-        # Infopanel
+        # Info panel
         self.info = tk.Text(self.frame, width=37, height=11)
         self.scrollInfo = tk.Scrollbar(self.frame)
         self.scrollInfo.config(command=self.info.yview)
