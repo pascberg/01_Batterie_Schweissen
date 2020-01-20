@@ -4,7 +4,6 @@ import platform
 import tkinter as tk
 from tkinter import ttk
 import cv2
-import numpy as np
 import lib.Functions as Func
 import lib.LogFile as Log
 import lib.Arduino as Ard
@@ -15,6 +14,7 @@ import lib.Dialog as Dlg
 makeLogFile = False  # bool to turn logfiles on or off
 
 
+# noinspection PyBroadException,PyUnusedLocal
 class ProcessGui:  # main class where all instances are combined
     def __init__(self):
         self.window = tk.Tk()  # initialises main window
@@ -30,7 +30,8 @@ class ProcessGui:  # main class where all instances are combined
         self.startProcessAir = list()  # list for the pneumatic controlled threads
         if makeLogFile:
             self.log = Log.LogFile('Test')
-        if platform.system() == "Windows":  # sets window to appropiate size for os and initialises Arduinos to their compatible ports
+        if platform.system() == "Windows":  # sets window to appropriate size for os and initialises Arduinos to their
+            # compatible ports
             self.Arduino1 = Ard.Arduino(self, name="Arduino 1", port='COM7')
             self.Arduino2 = Ard.Arduino(self, name="Arduino 2", port='COM6')
             self.window.geometry("800x480")
@@ -55,8 +56,9 @@ class ProcessGui:  # main class where all instances are combined
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         Conf.writeConfig(self.config.filename, self.config)  # saves all data to save in config file
-        for i in self.Process: i.runs = False  # gives all threads in process the stop signal
-        self.sendToArduino(self.Arduino1, ["", "", "stop", ""])  # sends stop siignal to arduinos
+        for i in self.Process:
+            i.runs = False  # gives all threads in process the stop signal
+        self.sendToArduino(self.Arduino1, ["", "", "stop", ""])  # sends stop signal to arduinos
         self.sendToArduino(self.Arduino2, ["", "", "stop", ""])
         self.Arduino1.runs = False  # sends stop signal to arduino thread and waits for them to end
         self.Arduino1.join()
@@ -64,7 +66,8 @@ class ProcessGui:  # main class where all instances are combined
         self.Arduino2.join()
         print("Closed")
 
-    def clearFrame(self, frame):  # kills all objects inside of frame
+    @staticmethod
+    def clearFrame(frame):  # kills all objects inside of frame
         a = frame.winfo_children()
         for item in a:
             item.destroy()
@@ -85,11 +88,13 @@ class ProcessGui:  # main class where all instances are combined
         else:
             self.FrameLeft.writeToInfo(str(Arduino.name) + " not connected")
 
-    def getNumber(self, event):  # short function to open number dialog any time a entry field is klicked
+    # noinspection PyTypeChecker
+    def getNumber(self, event):  # short function to open number dialog any time a entry field is clicked
         focus = self.window.focus_get()
         if type(focus) == tk.Entry:
             value = [focus.get()]
-            if value[0] == '0': value[0] = None
+            if value[0] == '0':
+                value[0] = None
             Dlg.dialogNumber(self, title="Number Dialog", value=value)
             if value[0]:
                 focus.delete(0, tk.END)
@@ -102,6 +107,7 @@ class frameRight:  # frame for various controls
         self.frame = tk.Frame(self.gui.window)
 
 
+# noinspection PyUnusedLocal
 class frameLeft:  # frame for process control, massage box and control tree
     def __init__(self, gui):  # initialises frame
         self.gui = gui
@@ -149,17 +155,25 @@ class frameLeft:  # frame for process control, massage box and control tree
         self.info.insert(tk.END, str(s) + '\n')
         self.info.config(state=tk.DISABLED)
         self.info.see(tk.END)
-        if self.gui.log: self.gui.log.writeToLogFile(str(s))
+        if self.gui.log:
+            self.gui.log.writeToLogFile(str(s))
 
     def treeClicked(self, event):  # function to determine which tree element was clicked and init their class
-        if (self.tree.focus() == self.CameraAlignment): camera(self)
+        if self.tree.focus() == self.CameraAlignment:
+            camera(self)
         for i in self.BatteryAlignment:
-            if (self.tree.focus() == i): batteryAlignment(self, self.BatteryAlignment.index(i))
-        if (self.tree.focus() == self.Clear): self.gui.clearFrame(self.gui.FrameRight.frame)
-        if (self.tree.focus() == self.Alignment): alignment(self)
-        if (self.tree.focus() == self.Positioning): positioning(self)
-        if (self.tree.focus() == self.Arrester): arrester(self)
-        if (self.tree.focus() == self.Test): test(self.gui)
+            if self.tree.focus() == i:
+                batteryAlignment(self, self.BatteryAlignment.index(i))
+        if self.tree.focus() == self.Clear:
+            self.gui.clearFrame(self.gui.FrameRight.frame)
+        if self.tree.focus() == self.Alignment:
+            alignment(self)
+        if self.tree.focus() == self.Positioning:
+            positioning(self)
+        if self.tree.focus() == self.Arrester:
+            arrester(self)
+        if self.tree.focus() == self.Test:
+            test(self.gui)
 
     def processControl(self, control):  # controls the process and its threads, contorl is just an int
         if not self.gui.Process:
@@ -199,10 +213,12 @@ class frameLeft:  # frame for process control, massage box and control tree
         self.gui.startProcessAir[-1].start()
 
 
+# noinspection PyBroadException,PyUnusedLocal
 class stream:  # class for streaming video from ip camera
-    # the standart camera config is saved in Functions.py as default, but can be changed here if needed
+    # the standard camera config is saved in Functions.py as default, but can be changed here if needed
     def __init__(self, frame, func=None,
-                 arg=None):  # initialises the stream and video size, frames and video capture, func can be used to alter stream
+                 arg=None):  # initialises the stream and video size, frames and video capture, func can be used to
+        # alter stream
         self.frame = frame
         self.func = func
         self.arg = arg
@@ -245,7 +261,7 @@ class stream:  # class for streaming video from ip camera
             label.config(image=photo)
             label.image = photo
 
-    def safeScreenshot(self):  # safes a screenshot, but without funtion
+    def safeScreenshot(self):  # safes a screenshot, but without function
         success, img = self.vcap.read()
         filename = "screenshot " + Func.getTimeStamp("%d-%b-%Y %H-%M-%S") + ".jpg"
         cv2.imwrite(filename, img)
@@ -327,7 +343,7 @@ class camera:  # class just for handling a camera stream with only option to tak
 
 
 class batteryAlignment:  # class for ui to change positions from battery positions
-    def __init__(self, frame, row):  # inits all fields and loads data from config
+    def __init__(self, frame, row):  # initialises all fields and loads data from config
         self.frame = frame
         self.row = row
         self.frame.gui.clearFrame(self.frame.gui.FrameRight.frame)
@@ -354,7 +370,7 @@ class batteryAlignment:  # class for ui to change positions from battery positio
                                        command=lambda: self.refresh()).grid(row=5, column=0)
         self.frame.gui.window.bind('<Return>', self.enter)
 
-    def enter(self, event):  # refreshes all values when initialised
+    def enter(self):  # refreshes all values when initialised
         self.refresh()
 
     def refresh(self):  # refreshes all values
@@ -365,7 +381,7 @@ class batteryAlignment:  # class for ui to change positions from battery positio
 
 
 class alignment:  # class which holds all controls for the alignment part
-    def __init__(self, frame):  # inits diffrent contorl classes
+    def __init__(self, frame):  # initialises different control classes
         self.frame = frame
         self.frame.gui.clearFrame(self.frame.gui.FrameRight.frame)
         self.Nema17 = motorControl(self, self.frame.gui.Arduino1, "Nema17Ali")

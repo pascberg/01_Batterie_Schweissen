@@ -2,8 +2,10 @@ import serial
 import threading
 import time
 
+
+# noinspection PyBroadException
 class Arduino(threading.Thread):
-    def __init__(self, gui, port = 'COM5', name = "Arduino"):
+    def __init__(self, gui, port='COM5', name="Arduino"):
         threading.Thread.__init__(self)
         self.gui = gui
         self.port = port
@@ -15,30 +17,34 @@ class Arduino(threading.Thread):
         self.var = list()
         try:
             self.Arduino = serial.Serial(self.port, 9600)
-            #time.sleep(2) #wait for 2 Seconds until connection is established
+            # time.sleep(2) #wait for 2 Seconds until connection is established
             self.connected = True
         except:
             pass
+
     def run(self):
         self.runs = True
-        if not self.connected: return
+        if not self.connected:
+            return
         while self.runs:
             if self.Arduino.in_waiting:
                 self.var.append(str(repr(self.Arduino.readline())[2:-5]))
                 self.gui.FrameLeft.writeToInfo(self.name + " " + str(self.var[-1]))
             time.sleep(0.1)
-    def sendToArduino (self, task, wait = False):
+
+    def sendToArduino(self, task, wait=False):
         # task = ["Typ","Name","Order", "Data"]
-        #try:
-        massage = task[0] + '|' + task[1] + '|' + task[2] + '|' + task[3] +'|'
+        # try:
+        massage = task[0] + '|' + task[1] + '|' + task[2] + '|' + task[3] + '|'
         self.Arduino.write(bytes(massage.encode("ascii")))
-        #return massage
+        # return massage
         while wait:
-            if self.finishedArduino(): break
+            if self.finishedArduino():
+                break
             time.sleep(0.1)
-        #except:
-        #print("Error: sendToArduino")
-        #return False
+        # except:
+        # print("Error: sendToArduino")
+        # return False
 
     def finishedArduino(self):
         s = "complete"
