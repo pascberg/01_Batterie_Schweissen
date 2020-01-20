@@ -44,7 +44,7 @@ class ProcessGui:  # main class where all instances are combined
             self.window.geometry("800x480")
             self.FrameLeft.startAirControl()
         try:
-            self.config = Conf.openConfig('GUI.config')  # trys to load existing config, else makes new
+            self.config = Conf.openConfig('GUI.config')  # try to load existing config, else makes new
         except:
             self.config = Conf.Config('GUI.config')
         self.window.bind("<ButtonRelease-1>", self.getNumber)
