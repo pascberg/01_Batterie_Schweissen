@@ -124,13 +124,16 @@ class startProcessAir(threading.Thread):
         threading.Thread.__init__(self)
         self.gui = gui
         self.runs = False
-        self.pin = Button(7)
+        self.pin = Button(17)
 
     def run(self):
         self.runs = True
+        isOn = None
         while self.runs:
-            if self.pin.is_pressed:
-                self.gui.frameLeft.processControl(1)
-                break
+            if self.pin.is_pressed and not isOn:
+                self.gui.FrameLeft.processControl(1)
+                isOn = True
                 # button.when_pressed = self.gui.frameLeft.processControl(1)
+            if self.pin.is_released and isOn:
+                self.gui.FrameLeft.processControl(-1)
             time.sleep(0.1)
