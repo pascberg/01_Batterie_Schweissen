@@ -42,7 +42,7 @@ class ProcessGui:  # main class where all instances are combined
             self.Arduino2 = Ard.Arduino(self, name="Arduino 2", port='/dev/ttyACM1')
             self.window.attributes('-fullscreen', True)
             self.window.geometry("800x480")
-            self.FrameLeft.startAirControl()
+            self.FrameLeft.startAirControl(1)
         try:
             self.config = Conf.openConfig('GUI.config')  # try to load existing config, else makes new
         except:
@@ -60,6 +60,10 @@ class ProcessGui:  # main class where all instances are combined
         Conf.writeConfig(self.config.filename, self.config)  # saves all data to save in config file
         for i in self.Process:
             i.runs = False  # gives all threads in process the stop signal
+            i.join()
+        for i in self.startProcessAir:
+            i.runs = False  # gives all threads in process the stop signal
+            i.join()
         self.sendToArduino(self.Arduino1, ["", "", "stop", ""])  # sends stop signal to arduinos
         self.sendToArduino(self.Arduino2, ["", "", "stop", ""])
         self.Arduino1.runs = False  # sends stop signal to arduino thread and waits for them to end
@@ -205,14 +209,17 @@ class frameLeft:  # frame for process control, massage box and control tree
             else:
                 self.writeToInfo("Process has not been started")
 
-    def startAirControl(self):
-        if not self.gui.startProcessAir:
-            self.gui.startProcessAir.append(Proc.startProcessAir(self.gui))
-        else:
-            if not self.gui.startProcessAir[-1].isAlive():
-                self.gui.startProcessAir.pop(-1)
-                self.gui.startProcessAir.append(Proc.Process(self.gui))
-        self.gui.startProcessAir[-1].start()
+    def startAirControl(self, control):
+        if control == 1:
+            if not self.gui.startProcessAir:
+                self.gui.startProcessAir.append(Proc.startProcessAir(self.gui))
+            else:
+                if not self.gui.startProcessAir[-1].isAlive():
+                    self.gui.startProcessAir.pop(-1)
+                    self.gui.startProcessAir.append(Proc.Process(self.gui))
+            self.gui.startProcessAir[-1].start()
+        if control == 0:
+            self.gui.startProcessAir[-1].run = False
 
 
 # noinspection PyBroadException,PyUnusedLocal

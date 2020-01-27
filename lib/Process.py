@@ -124,7 +124,7 @@ class startProcessAir(threading.Thread):
         threading.Thread.__init__(self)
         self.gui = gui
         self.runs = False
-        self.pin = Button(17)
+        self.pin = Button(7)
 
     def run(self):
         self.runs = True
