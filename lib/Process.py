@@ -1,6 +1,7 @@
 import threading
 import time
 
+import cv2
 from gpiozero import Button
 
 import lib.Functions as Func
@@ -51,11 +52,11 @@ class Process(threading.Thread):
         self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["Motor", "Nema17Vac", "moveTo", str(
             config.getPosition(config.Nema17Vac, "Welding"))]]])
         self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["Motor", "Nema17Arr", "reset", "None"]]])
-        """
         # Angle acquisition
         self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino1, ["Motor", "Nema17Pos", "moveTo", str(
             config.getPosition(config.Nema17Pos, "Alignment"))]]])
         self.tasks.append([self.getAngles, [config.batAngleBefore]])
+        """
         # Alignment of batteries
         for i in range(1, 6):
             self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino1, ["Motor", "Nema17Ali", "moveTo", str(
@@ -73,6 +74,7 @@ class Process(threading.Thread):
                 self.tasks.append(
                     [self.gui.taskToArduino, [self.gui.Arduino1, ["Motor", "48BJY28 " + str(j), "reset", "None"]]])
             self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino1, ["OnOff", "Magnets", "set", "Off"]]])
+        self.tasks.append([self.getAngles, [config.batAngleAfter]])
         # Welding
         """
         for i in range(1, 6):
@@ -103,6 +105,7 @@ class Process(threading.Thread):
             self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino1, ["", "", "wait", "1000"]]])
         self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino1, ["Motor", "Nema17Pos", "moveTo", str(
             config.getPosition(config.Nema17Pos, "Alignment"))]]])
+        self.tasks.append([self.getImg, ["AfterWelding"]])
         self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["OnOff", "Pump", "set", "Off"]]])
 
         # Restart startProcessAir
@@ -113,10 +116,19 @@ class Process(threading.Thread):
 
     # noinspection PyAttributeOutsideInit
     def getAngles(self, batAngles):
-        self.vcap = Func.openVideoCapture()
-        success, img = self.vcap.read()
+        vcap = Func.openVideoCapture()
+        success, img = vcap.read()
         Func.anglesBatteries(img, self.gui.config.batpos, batAngles)
-        Func.closeVideoCapture(self.vcap)
+        Func.closeVideoCapture(vcap)
+        filename = "Angles " + Func.getTimeStamp("%d-%b-%Y %H-%M-%S") + ".jpg"
+        cv2.imwrite(filename, img)
+
+    def getImg(self, name="Screenshot"):
+        vcap = Func.openVideoCapture()
+        Func.closeVideoCapture(vcap)
+        success, img = vcap.read()
+        filename = name + " " + Func.getTimeStamp("%d-%b-%Y %H-%M-%S") + ".jpg"
+        cv2.imwrite(filename, img)
 
 
 class startProcessAir(threading.Thread):
@@ -130,10 +142,11 @@ class startProcessAir(threading.Thread):
         self.runs = True
         isOn = None
         while self.runs:
-            if self.pin.is_pressed and not isOn:
+            if self.pin.value == 1 and not isOn:
                 self.gui.FrameLeft.processControl(1)
                 isOn = True
                 # button.when_pressed = self.gui.frameLeft.processControl(1)
-            if self.pin.is_released and isOn:
+            if self.pin.value == 0 and isOn:
                 self.gui.FrameLeft.processControl(-1)
+                isOn = False
             time.sleep(0.1)
