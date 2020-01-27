@@ -1,6 +1,7 @@
-import serial
 import threading
 import time
+
+import serial
 
 
 # noinspection PyBroadException
@@ -29,7 +30,10 @@ class Arduino(threading.Thread):
         while self.runs:
             if self.Arduino.in_waiting:
                 self.var.append(str(repr(self.Arduino.readline())[2:-5]))
-                self.gui.FrameLeft.writeToInfo(self.name + " " + str(self.var[-1]))
+                try:
+                    self.gui.FrameLeft.writeToInfo(self.name + " " + str(self.var[-1]))
+                except:
+                    print(self.name + " " + str(self.var[-1]))
             time.sleep(0.1)
 
     def sendToArduino(self, task, wait=False):

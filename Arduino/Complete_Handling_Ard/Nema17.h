@@ -28,6 +28,8 @@ class Nema17 {
     bool moveTo(int steps);
     bool moveSteps(int steps);
     bool reset();
+    void setAccel(int accel);
+    void setSpeed(int speed);
     inline int Speed(int maxspeed) {
       m_MaxSpeed = maxspeed;
       return m_MaxSpeed;
@@ -54,6 +56,16 @@ Nema17::Nema17(int pins[][3], bool dir[], int numMotors, Control* control, int c
     m_MotorArray[i] = new AccelStepper(1, pins[i][1], pins[i][2]);
     m_MotorArray[i]->setMaxSpeed(m_MaxSpeed);
     m_MotorArray[i]->setAcceleration(m_Accelaration);
+  }
+}
+void Nema17::setAccel(int accel) {
+  for (int i = 0; i < m_NumMotors; i++) { //sets all motors to given acceleration
+    if (!m_dir[i]) m_MotorArray[i]->setAcceleration(accel);
+  }
+}
+void Nema17::setSpeed(int speed) {
+  for (int i = 0; i < m_NumMotors; i++) { //sets all motors to given acceleration
+    if (!m_dir[i]) m_MotorArray[i]->setMaxSpeed(speed);
   }
 }
 bool Nema17::moveTo(int steps) { //moves all motors to given steps

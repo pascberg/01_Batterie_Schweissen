@@ -44,7 +44,7 @@ bool dirNEMA17Vac[] = {true};
 int pinValveAlignment = 55;
 int pinValveWelding = 54;
 int pinValveVacuum = 55;
-int pinPumpVacuum = 56;
+int pinPumpVacuum = 6;
 int pinMagnets = 56;
 int pinBuzzer = 12;
 //Contactswitch Config
@@ -85,6 +85,8 @@ bool parseTask(String massage[]) {
       if (Order == "moveTo") nema17->moveTo(Data.toInt());
       if (Order == "moveSteps") nema17->moveSteps(Data.toInt());
       if (Order == "position") Serial.println(nema17->currentPosition());
+      if (Order == "setSpeed") nema17->setSpeed(Data.toInt());
+      if (Order == "setAcceleration") nema17->setAccel(Data.toInt());
       if (Order == "reset") nema17->reset();
     }
     if (BJy48 != nullptr) {

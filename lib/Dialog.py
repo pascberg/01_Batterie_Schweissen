@@ -1,7 +1,9 @@
 import tkinter as tk
 from tkinter import ttk
-import time
-import os
+
+
+# import time
+# import os
 
 
 # noinspection PyUnusedLocal,PyMethodMayBeStatic
@@ -161,16 +163,20 @@ class motorConfig(Dialog):
         for i in range(len(self.pos)):
             self.tree.insert("", "end", text=self.pos[i][0], values=(self.pos[i][1]))
         # self.tree.bind("<Double-Button-1>", self.editPosition)
-        self.tree.grid(row=0, column=0, columnspan=1, rowspan=4, sticky="nsew", pady=10)
-        self.scrollTree.grid(row=0, column=1, rowspan=4, sticky="nse", pady=10)
+        self.tree.grid(row=0, column=0, columnspan=1, rowspan=6, sticky="nsew", pady=10)
+        self.scrollTree.grid(row=0, column=1, rowspan=6, sticky="nse", pady=10)
         self.buttonNew = tk.Button(master, text=" New ", command=lambda: self.newPosition())
         self.buttonConf = tk.Button(master, text="Edit", command=lambda: self.editPosition())
         self.buttonDel = tk.Button(master, text="Delete", command=lambda: self.delPosition())
         self.buttonMove = tk.Button(master, text="Move", command=lambda: self.movePosition())
+        self.buttonSpeed = tk.Button(master, text=" Speed ", command=lambda: self.editSpeed())
+        self.buttonAccel = tk.Button(master, text=" Accel ", command=lambda: self.editAccel())
         self.buttonNew.grid(row=0, column=2, rowspan=1, sticky="nsew", pady=2)
         self.buttonConf.grid(row=1, column=2, rowspan=1, sticky="nsew", pady=2)
         self.buttonDel.grid(row=2, column=2, rowspan=1, sticky="nsew", pady=2)
         self.buttonMove.grid(row=3, column=2, rowspan=1, sticky="nsew", pady=2)
+        self.buttonSpeed.grid(row=4, column=2, rowspan=1, sticky="nsew", pady=2)
+        self.buttonAccel.grid(row=5, column=2, rowspan=1, sticky="nsew", pady=2)
 
     def mUpdate(self):
         self.frameBody(self.frame)
@@ -204,6 +210,19 @@ class motorConfig(Dialog):
         self.gui.sendToArduino(self.motor.Arduino, ["Motor", self.motor.motorName, "moveTo", str(self.pos[index][1])])
         # self.motor.Arduino.sendToArduino(["Motor", self.motor.motorName, "moveTo", self.pos[index][1]])
         self.mUpdate()
+
+    def editSpeed(self):
+        value = [None]
+        dialogNumber(self.gui, title="set Speed", value=value)
+        if value[0]:
+            self.gui.sendToArduino(self.motor.Arduino, ["Motor", self.motor.motorName, "setSpeed", str(value[0])])
+
+    def editAccel(self):
+        value = [None]
+        dialogNumber(self.gui, title="set Acceleration", value=value)
+        if value[0]:
+            self.gui.sendToArduino(self.motor.Arduino,
+                                   ["Motor", self.motor.motorName, "setAcceleration", str(value[0])])
 
     def apply(self):
         pass

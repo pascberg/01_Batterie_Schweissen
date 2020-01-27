@@ -1,6 +1,8 @@
 import threading
 import time
+
 from gpiozero import Button
+
 import lib.Functions as Func
 
 
@@ -32,7 +34,8 @@ class Process(threading.Thread):
         # for i in range(2): #for testing purposes
         #    self.tasks.append([self.testTask, [i, 2]])
         # Reset Part
-        # self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["OnOff","Pump","set", "On"]]])
+        self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["OnOff", "Pump", "set", "On"]]])
+        self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["Motor", "Nema17Arr", "setSpeed", "400"]]])
         self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino1, ["Motor", "Nema17Ali", "reset", "None"]]])
         self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino1, ["Motor", "Nema17Pos", "reset", "None"]]])
         self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["Motor", "Nema17Arr", "reset", "None"]]])
@@ -40,7 +43,7 @@ class Process(threading.Thread):
         self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino1, ["OnOff", "PistonAli", "set", "Off"]]])
         self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino1, ["OnOff", "Vacuum", "set", "Off"]]])
         self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino1, ["OnOff", "Magnets", "set", "Off"]]])
-        # Angle aquisition self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["Motor","Nema17Vac",
+        # self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["Motor","Nema17Vac",
         # "moveTo", str(config.getPosition(config.Nema17Vac, "Welding"))]]])
         self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["Motor", "Nema17Arr", "moveTo", str(
             config.getPosition(config.Nema17Arr, "Spin"))]]])
@@ -48,6 +51,8 @@ class Process(threading.Thread):
         self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["Motor", "Nema17Vac", "moveTo", str(
             config.getPosition(config.Nema17Vac, "Welding"))]]])
         self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["Motor", "Nema17Arr", "reset", "None"]]])
+        """
+        # Angle acquisition
         self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino1, ["Motor", "Nema17Pos", "moveTo", str(
             config.getPosition(config.Nema17Pos, "Alignment"))]]])
         self.tasks.append([self.getAngles, [config.batAngleBefore]])
@@ -69,6 +74,7 @@ class Process(threading.Thread):
                     [self.gui.taskToArduino, [self.gui.Arduino1, ["Motor", "48BJY28 " + str(j), "reset", "None"]]])
             self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino1, ["OnOff", "Magnets", "set", "Off"]]])
         # Welding
+        """
         for i in range(1, 6):
             self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino1, ["Motor", "Nema17Pos", "moveTo", str(
                 config.getPosition(config.Nema17Pos, "Welding " + str(i)))]]])
@@ -79,8 +85,13 @@ class Process(threading.Thread):
             self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["Motor", "Nema17Arr", "moveTo", str(
                 config.getPosition(config.Nema17Arr, "Welding"))]]])
             self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["OnOff", "Vacuum", "set", "On"]]])
+            self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["Motor", "Nema17Arr", "setSpeed", "50"]]])
             self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["Motor", "Nema17Arr", "moveTo", str(
-                config.getPosition(config.Nema17Arr, "Spin"))]]])
+                config.getPosition(config.Nema17Arr, "SpinSlow"))]]])
+            self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["", "", "wait", "1000"]]])
+            self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["Motor", "Nema17Arr", "setSpeed", "400"]]])
+            self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["", "", "wait", "1000"]]])
+            self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["Motor", "Nema17Vac", "reset", "None"]]])
             self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["Motor", "Nema17Vac", "moveTo", str(
                 config.getPosition(config.Nema17Vac, "Welding"))]]])
             self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["Motor", "Nema17Arr", "reset", "None"]]])
