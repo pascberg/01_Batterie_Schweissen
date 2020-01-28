@@ -60,10 +60,12 @@ class ProcessGui:  # main class where all instances are combined
         Conf.writeConfig(self.config.filename, self.config)  # saves all data to save in config file
         for i in self.Process:
             i.runs = False  # gives all threads in process the stop signal
-            i.join()
+            if i.is_alive():
+                i.join()
         for i in self.startProcessAir:
             i.runs = False  # gives all threads in process the stop signal
-            i.join()
+            if i.is_alive():
+                i.join()
         self.sendToArduino(self.Arduino1, ["", "", "stop", ""])  # sends stop signal to arduinos
         self.sendToArduino(self.Arduino2, ["", "", "stop", ""])
         self.Arduino1.runs = False  # sends stop signal to arduino thread and waits for them to end

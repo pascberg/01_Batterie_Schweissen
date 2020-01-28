@@ -105,9 +105,10 @@ bool Nema17::reset() { //moves all motors backwards until the endstop is reached
   for (int i = 0; i < m_NumMotors; i++) {
     m_MotorArray[i]->stop();
     m_MotorArray[i]->setCurrentPosition(0);
-    digitalWrite(m_Enable, LOW);
-    return true;
   }
+  digitalWrite(m_Enable, LOW);
+    return true;
+  
   return false;
 }
 #endif
