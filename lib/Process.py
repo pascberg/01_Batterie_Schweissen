@@ -52,11 +52,12 @@ class Process(threading.Thread):
         self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["Motor", "Nema17Vac", "moveTo", str(
             config.getPosition(config.Nema17Vac, "Welding"))]]])
         self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["Motor", "Nema17Arr", "reset", "None"]]])
+        """
         # Angle acquisition
         self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino1, ["Motor", "Nema17Pos", "moveTo", str(
             config.getPosition(config.Nema17Pos, "Alignment"))]]])
         self.tasks.append([self.getAngles, [config.batAngleBefore]])
-        # """
+        
         # Alignment of batteries
         for i in range(1, 6):
             self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino1, ["Motor", "Nema17Ali", "moveTo", str(
@@ -75,6 +76,7 @@ class Process(threading.Thread):
                     [self.gui.taskToArduino, [self.gui.Arduino1, ["Motor", "48BJY28 " + str(j), "reset", "None"]]])
             self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino1, ["OnOff", "Magnets", "set", "Off"]]])
         self.tasks.append([self.getAngles, [config.batAngleAfter]])
+        """
         # Welding
         for i in range(1, 6):
             self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino1, ["Motor", "Nema17Pos", "moveTo", str(
