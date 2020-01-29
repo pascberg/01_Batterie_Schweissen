@@ -3,6 +3,7 @@
   Created by Pascal Berger, November, 2019 at Fraunhofer IPA
 */
 #include <AccelStepper.h>
+#include <MultiStepper.h>
 #include "Contactswitch.h"
 #include "Control.h"
 #ifndef Nema17_h
@@ -13,7 +14,7 @@
 class Nema17 {
   private:
     AccelStepper** m_MotorArray;
-    AccelStepper* m_Motor;
+    MultiStepper* m_Motor;
     Control* m_Control;
     int m_MaxSpeed;
     int m_Accelaration;
@@ -46,6 +47,7 @@ Nema17::Nema17(int pins[][3], bool dir[], int numMotors, Control* control, int c
   m_MaxSpeed = maxSpeed;
   m_Accelaration = accelaration;
   m_MotorArray = new AccelStepper*[numMotors];
+  m_Motor = new MultiStepper();
   m_Cs = new Contactswitch(csPin); //switch for endstop
   m_dir = dir;
   m_Control = control;
@@ -54,9 +56,10 @@ Nema17::Nema17(int pins[][3], bool dir[], int numMotors, Control* control, int c
   //pinMode(35, OUTPUT);
   for (int i = 0; i < numMotors; i++) {
     m_MotorArray[i] = new AccelStepper(1, pins[i][1], pins[i][2]);
-    m_MotorArray[i]->setMaxSpeed(m_MaxSpeed);
     m_MotorArray[i]->setAcceleration(m_Accelaration);
+    m_Motor->addStepper(*m_MotorArray[i]);
   }
+  setSpeed(maxSpeed);
 }
 void Nema17::setAccel(int accel) {
   for (int i = 0; i < m_NumMotors; i++) { //sets all motors to given acceleration
@@ -64,8 +67,12 @@ void Nema17::setAccel(int accel) {
   }
 }
 void Nema17::setSpeed(int speed) {
+  m_MaxSpeed = speed;
   for (int i = 0; i < m_NumMotors; i++) { //sets all motors to given acceleration
-    if (!m_dir[i]) m_MotorArray[i]->setMaxSpeed(speed);
+    if (m_dir[i]) m_MotorArray[i]->setMaxSpeed(speed);
+    else m_MotorArray[i]->setMaxSpeed(-speed);
+    if (m_dir[i]) m_MotorArray[i]->setSpeed(speed);
+    else m_MotorArray[i]->setSpeed(-speed);
   }
 }
 bool Nema17::moveTo(int steps) { //moves all motors to given steps
@@ -75,6 +82,8 @@ bool Nema17::moveTo(int steps) { //moves all motors to given steps
     else m_MotorArray[i]->moveTo(steps);
   }
   while (m_MotorArray[0]->currentPosition() != m_MotorArray[0]->targetPosition() && m_Control->Check()) {//moves the motors until they reacherd their destination or Check returns false
+    //m_Motor->run();
+    //for (int i = 0; i < m_NumMotors; i++) m_MotorArray[i]->runSpeed();
     for (int i = 0; i < m_NumMotors; i++) m_MotorArray[i]->run();
   }
   digitalWrite(m_Enable, LOW); //turns motors off
@@ -87,19 +96,22 @@ bool Nema17::moveSteps(int steps) { //moves all motors a delta steps from their 
     else m_MotorArray[i]->move(steps);
   }
   while (m_MotorArray[0]->currentPosition() != m_MotorArray[0]->targetPosition() && m_Control->Check()) {
+    //m_Motor->run();
+    //for (int i = 0; i < m_NumMotors; i++) m_MotorArray[i]->runSpeed();
     for (int i = 0; i < m_NumMotors; i++) m_MotorArray[i]->run();
   }
   digitalWrite(m_Enable, LOW);
   return true;
 }
 bool Nema17::reset() { //moves all motors backwards until the endstop is reached, after that sets made steps to zero
+  unsigned long stepsMade = 0;
   digitalWrite(m_Enable, HIGH);
   for (int i = 0; i < m_NumMotors; i++) {
     if (!m_dir[i]) m_MotorArray[i]->setSpeed(m_MaxSpeed);
     else m_MotorArray[i]->setSpeed(-m_MaxSpeed);
   }
   while (m_Control->Check()) {
-    for (int i = 0; i < m_NumMotors; i++) m_MotorArray[i]->runSpeed();
+    for (int i = 0; i < m_NumMotors; i++) if (m_MotorArray[i]->runSpeed()) stepsMade++;
     if (m_Cs->Status()) break;
   }
   for (int i = 0; i < m_NumMotors; i++) {
@@ -107,8 +119,7 @@ bool Nema17::reset() { //moves all motors backwards until the endstop is reached
     m_MotorArray[i]->setCurrentPosition(0);
   }
   digitalWrite(m_Enable, LOW);
-    return true;
-  
-  return false;
+  Serial.println(stepsMade/m_NumMotors);
+  return true;
 }
 #endif

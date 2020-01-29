@@ -34,7 +34,7 @@ class Control {
 };
 
 bool Control::Check() { //checks for new massages and saves them in buffer and returns true when no new task needs to be done
-  if (!Serial.available()) return true; //checks serial
+  if (!Serial.available() > 0) return true; //checks serial
   else {
     m_BufferPos++;
     for (int i = 0; i < 4; i++) m_Buffer[m_BufferPos][i] = Serial.readStringUntil('|'); //reads massage parts in buffer

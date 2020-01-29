@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # file for the complete user interface to control the handling of the batteries in the laser cell
 import platform
+import time
 import tkinter as tk
 from tkinter import ttk
 
@@ -92,7 +93,12 @@ class ProcessGui:  # main class where all instances are combined
         if Arduino.connected:
             if self.log:
                 self.log.writeToLogFile(str(message))
-            Arduino.sendToArduino(message, True)
+            Arduino.sendToArduino(message)
+            s = "complete"
+            while True:
+                if s in Arduino.var[-1]:
+                    break
+                time.sleep(0.1)
         else:
             self.FrameLeft.writeToInfo(str(Arduino.name) + " not connected")
 
@@ -159,10 +165,13 @@ class frameLeft:  # frame for process control, massage box and control tree
         self.scrollInfo.grid(row=4, column=4, rowspan=2, sticky="nse")
 
     def writeToInfo(self, s):  # writes a massage to the textbox and logfile if present
-        self.info.config(state=tk.NORMAL)  # enables and disables writing so only funtions can write massages
-        self.info.insert(tk.END, str(s) + '\n')
-        self.info.config(state=tk.DISABLED)
-        self.info.see(tk.END)
+        try:
+            self.info.config(state=tk.NORMAL)  # enables and disables writing so only functions can write massages
+            self.info.insert(tk.END, str(s) + '\n')
+            self.info.config(state=tk.DISABLED)
+            self.info.see(tk.END)
+        except:
+            print(s)
         if self.gui.log:
             self.gui.log.writeToLogFile(str(s))
 
@@ -436,9 +445,14 @@ class test:  # just for testing stuff
         self.gui = gui
         print("Test")
         self.frame = gui.FrameRight
-        self.frame.gui.clearFrame(self.frame.gui.FrameRight.frame)
-        self.Nema17 = motorControl(self, self.frame.gui.Arduino1, "Nema17Test")
+        self.gui.clearFrame(self.gui.FrameRight.frame)
+        self.Nema17 = motorControl(self, self.frame.gui.Arduino2, "Nema17Arr")
         self.Nema17.mFrame.grid(row=0, column=0, sticky="nsew")
+        self.buttonTest = tk.Button(self.gui.FrameRight.frame, text="Test", command=lambda: self.setSteps())
+        self.buttonTest.grid(row=1, column=0, padx=3, pady=2, sticky="nsw")
+
+    def setSteps(self):
+        self.gui.taskToArduino(self.gui.Arduino2, ["Test1", "Test2", "wait", "2000"])
 
 
 with ProcessGui() as root:  # loop for main applications

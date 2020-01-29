@@ -62,9 +62,9 @@ bool parseTask(String massage[]) {
   String Name = massage[1];
   String Order = massage[2];
   String Data = massage[3];
-  String s = Type + " " + Name + " " + " " + Order + " " + Data;
+  String s = Type + " " + Name + " "  + Order + " " + Data;
   Serial.println(s); //just sends massage back for checking
-  //let the arduino wait until her returns complete
+  //let the arduino wait until it returns complete
   if (Order == "wait") delay(Data.toInt());
   if (Type == "Motor") {
     Nema17 *nema17 = nullptr;
@@ -145,15 +145,19 @@ void setup() {
 }
 
 void loop() {
-  //if (ValveVacuum->Status() && PsVac[0]->Status()) Serial.println("Alert Vacuum"); //checks weather vacuum is working if activated
-  MyControl->Check(); //checks serial for new massages
-  if (MyControl->BufferPos() > 0) {
+  //bif (Serial.available()) Serial.println(Serial.read());
+  
+    //if (ValveVacuum->Status() && PsVac[0]->Status()) Serial.println("Alert Vacuum"); //checks weather vacuum is working if activated
+    MyControl->Check(); //checks serial for new massages
+    if (MyControl->BufferPos() > 0) {
     parseTask(MyControl->Buffer(1)); //pases and executes first task in line
     MyControl->GoOn();
-  }
-  MyControl->Check(); //checks again before confim completion
-  if (MyControl->BufferPos() == 0 && MyControl->Runs()) {
+    }
+    //MyControl->Check(); //checks again before confim completion
+    if (MyControl->BufferPos() == 0 && MyControl->Runs()) {
     Serial.println("complete");
     MyControl->Runs(false);
-  }
+
+    }
+  
 }

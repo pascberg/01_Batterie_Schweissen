@@ -23,7 +23,7 @@ class Process(threading.Thread):
             while not self.paused and self.runs:
                 if self.currentTask < len(self.tasks):
                     self.tasks[self.currentTask][0](*self.tasks[self.currentTask][1])
-                    time.sleep(2)
+                    time.sleep(3)
                     self.currentTask += 1
                 if self.currentTask == len(self.tasks):
                     self.runs = False
@@ -56,7 +56,7 @@ class Process(threading.Thread):
         self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino1, ["Motor", "Nema17Pos", "moveTo", str(
             config.getPosition(config.Nema17Pos, "Alignment"))]]])
         self.tasks.append([self.getAngles, [config.batAngleBefore]])
-        """
+        # """
         # Alignment of batteries
         for i in range(1, 6):
             self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino1, ["Motor", "Nema17Ali", "moveTo", str(
@@ -76,7 +76,6 @@ class Process(threading.Thread):
             self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino1, ["OnOff", "Magnets", "set", "Off"]]])
         self.tasks.append([self.getAngles, [config.batAngleAfter]])
         # Welding
-        """
         for i in range(1, 6):
             self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino1, ["Motor", "Nema17Pos", "moveTo", str(
                 config.getPosition(config.Nema17Pos, "Welding " + str(i)))]]])
@@ -92,14 +91,14 @@ class Process(threading.Thread):
                 config.getPosition(config.Nema17Arr, "SpinSlow"))]]])
             self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["", "", "wait", "1000"]]])
             self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["Motor", "Nema17Arr", "setSpeed", "400"]]])
-            self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["", "", "wait", "1000"]]])
+            # self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["", "", "wait", "1000"]]])
             self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["Motor", "Nema17Vac", "reset", "None"]]])
             self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["Motor", "Nema17Vac", "moveTo", str(
                 config.getPosition(config.Nema17Vac, "Welding"))]]])
             self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["Motor", "Nema17Arr", "reset", "None"]]])
             self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino1, ["OnOff", "PistonPos", "set", "On"]]])
             # !!!Welding!!!
-            self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino1, ["", "", "wait", "10000"]]])
+            self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["", "", "wait", "10000"]]])
             self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["OnOff", "Vacuum", "set", "Off"]]])
             self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino1, ["OnOff", "PistonPos", "set", "Off"]]])
             self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino1, ["", "", "wait", "1000"]]])
@@ -109,7 +108,7 @@ class Process(threading.Thread):
         self.tasks.append([self.gui.taskToArduino, [self.gui.Arduino2, ["OnOff", "Pump", "set", "Off"]]])
 
         # Restart startProcessAir
-        self.tasks.append([self.gui.FrameLeft.startAirControl, []])
+        # self.tasks.append([self.gui.FrameLeft.startAirControl, [1]])
 
     def testTask(self, i, j):
         self.gui.FrameLeft.writeToInfo("Task " + str(i * j))
@@ -123,7 +122,8 @@ class Process(threading.Thread):
         filename = "Angles " + Func.getTimeStamp("%d-%b-%Y %H-%M-%S") + ".jpg"
         cv2.imwrite(filename, img)
 
-    def getImg(self, name="Screenshot"):
+    @staticmethod
+    def getImg(name="Screenshot"):
         vcap = Func.openVideoCapture()
         Func.closeVideoCapture(vcap)
         success, img = vcap.read()
