@@ -438,6 +438,8 @@ class arrester:  # class which holds all controls for the arrester part
         self.Vacuum.mFrame.grid(row=2, column=0, sticky="nsew")
         self.Pump = onOffControl(self, self.frame.gui.Arduino2, "Pump")
         self.Pump.mFrame.grid(row=3, column=0, sticky="nsew")
+        self.BigPump = onOffControl(self, self.frame.gui.Arduino2, "BigPump")
+        self.BigPump.mFrame.grid(row=4, column=0, sticky="nsew")
 
 
 class test:  # just for testing stuff
