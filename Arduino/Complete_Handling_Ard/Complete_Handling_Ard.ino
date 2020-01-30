@@ -21,6 +21,7 @@ OnOff *ValveAlignment;
 OnOff *ValveWelding;
 OnOff *ValveVacuum;
 OnOff *PumpVacuum;
+OnOff *BigPumpVacuum;
 OnOff *Magnets;
 
 Contactswitch *CsPos[2];
@@ -45,13 +46,14 @@ int pinValveAlignment = 55;
 int pinValveWelding = 54;
 int pinValveVacuum = 55;
 int pinPumpVacuum = 6;
+int pinBigPumpVacuum = 54;
 int pinMagnets = 56;
 int pinBuzzer = 12;
 //Contactswitch Config
-int pinCsPos[size(CsPos)] = {A6, A5};
-int pinCsAli[size(CsAli)] = {A7, 0};
-int pinCsArr[size(CsArr)] = {A6, 0};
-int pinCsVac[size(CsVac)] = {A5};
+int pinCsPos[size(CsPos)] = {A4, 0};
+int pinCsAli[size(CsAli)] = {A5, 0};
+int pinCsArr[size(CsArr)] = {A5, 0};
+int pinCsVac[size(CsVac)] = {A4};
 int pinPsVac[size(PsVac)] = {A3};
 
 //Functions
@@ -108,6 +110,7 @@ bool parseTask(String massage[]) {
     if (Name == "Magnets") onOff = Magnets;
     if (Name == "Vacuum") onOff = ValveVacuum;
     if (Name == "Pump") onOff = PumpVacuum;
+    if (Name == "BigPump") onOff = BigPumpVacuum;
     if (Order == "set") {
       if (Data == "On") onOff->on();
       if (Data == "Off") onOff->off();
@@ -133,6 +136,7 @@ void setup() {
   ValveWelding = new OnOff(pinValveWelding);
   ValveVacuum = new OnOff(pinValveVacuum);
   PumpVacuum = new OnOff(pinPumpVacuum);
+  BigPumpVacuum = new OnOff(pinBigPumpVacuum);
   Magnets = new OnOff(pinMagnets);
   //initilises all switches
   for (int i = 0; i < size(CsPos); i++) CsPos[i] = new Contactswitch(pinCsPos[i]);
